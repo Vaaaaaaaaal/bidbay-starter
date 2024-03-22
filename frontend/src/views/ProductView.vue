@@ -21,25 +21,28 @@ function formatDate(date) {
   return new Date(date).toLocaleDateString("fr-FR", options);
 }
 
-async function deleteProduct(productId) {
-  error.value = false;
-  loading.value = true;
+
+async function deleteProduct(){
+  loading.value = true
   try {
-    await fetch(`http://localhost:3000/api/products/${productId}`, {
-      method: "DELETE",
+    const response = await fetch('http://localhost:3000/api/products/' + productId.value, {
+      method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-    await router.push({
-      name: "Home",
-    });
-  } catch (e) {
-    error.value = true;
-  } finally {
-    loading.value = false;
+          authorization: `Bearer ${token.value}`,
+          accept: 'application/json'
+        }
+      })
+      if (response.ok) {
+        router.push({ name: "User", params: { userId:'me'}})
+      } else {
+        error.value = true
+      }
+    } catch (e) {
+      error.value = true
+    } finally {
+      loading.value = false
+    }
   }
-}
 
 const disabledAddBid = computed(() => {
   const maxPrice = lastBid.value?.price ?? 10;
@@ -188,7 +191,7 @@ fetchProduct();
               Editer
             </RouterLink>
             &nbsp;
-            <button class="btn btn-danger" data-test-delete-product @click.prevent="deleteProduct(product.id)">
+            <button @click="deleteProduct()" class="btn btn-danger" data-test-delete-product>
               Supprimer
             </button>
           </div>

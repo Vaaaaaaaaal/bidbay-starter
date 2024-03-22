@@ -17,8 +17,30 @@ router.get('/api/products', async (req, res, next) => {
 });
 
 router.get('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
-})
+  try {
+    const product = await Product.findByPk(req.params.productId, {
+      include: [{
+        model: User,
+        as: 'seller'
+      }, {
+        model: Bid,
+        as: 'bids',
+        include: {
+          model: User,
+          as: 'bidder'  
+        }
+      }]
+    });
+    if (!product) {
+      res.status(404).json({ error: 'Product not found' });
+    } else {
+      res.status(200).json(product);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // You can use the authMiddleware with req.user.id to authenticate your endpoint ;)
 

@@ -48,7 +48,7 @@
 			"response": []
 		},
 		{
-			"name": "/api/products",
+			"name": "/api/products/add",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -73,7 +73,7 @@
 					"raw": "{\n    \"name\": \"Machine à écrire\",\n    \"description\": \"Machine à écrire vintage en parfait état de fonctionnement pour une expérience d'écriture unique et authentique.\",\n    \"pictureUrl\": \"https://picsum.photos/id/403/512/512\",\n    \"category\": \"High-Tech\",\n    \"originalPrice\": 200,\n    \"startDate\": \"2023-01-01T09:00:00Z\",\n    \"endDate\": \"2026-01-01T09:00:00Z\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/products",
+					"raw": "http://localhost:3000/api/products/add",
 					"protocol": "http",
 					"host": [
 						"localhost"

@@ -45,7 +45,7 @@ const registerUser = async () => {
     } else {
       const { access_token } = await response.json();
       login(access_token);
-      router.push({ name: "Home" });
+      //router.push({ name: "Home" });
     }
   } catch (e) {
     errorMessage.value = e;

@@ -10,18 +10,71 @@ if (!isAuthenticated.value) {
   router.push({ name: "Login" });
 }
 
+const name = ref("");
+const description = ref("");
+const category = ref("");
+const price = ref("");
+const picture = ref("");
+const date = ref("");
+const isSubmitting = ref(false);
+
+//récupérer id de user actuel
+const userID = token.value.substring(0,32);
+console.log(userID);
+
 // router.push({ name: "Product", params: { productId: 'TODO } });
+
+const addProduct = async () => {
+
+  isSubmitting.value = true;
+  console.log(name);
+
+  
+
+  try {
+    const response = await fetch("http://localhost:3000/api/products/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productName: name.value,
+        description: description.value,
+        category: category.value,
+        originalPrice: price.value,
+        pictureUrl: picture.value,
+        endDate: date.value,
+        sellerId: userID,
+      }),
+    });
+    
+
+    if (!response.ok) {
+      const { error } = await response.json();
+      errorMessage.value = error;
+    } else {
+      const { product_id } = await response.json();
+      //router.push({ name: "Product", params: { productId: product_id } });
+    }
+  } catch (e) {
+    console.log(e);
+    // a tester 
+    let div = document.createElement('div');
+    div.className("alert alert-danger mt-4");
+    div.role("alert");
+    div.innerHTML("Une erreur s'est produite");
+    document.getElementsById("wrapper-form").appendChild(div);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
 </script>
 
 <template>
   <h1 class="text-center">Ajouter un produit</h1>
 
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div id="wrapper-form" class="col-md-6">
       <form>
-        <div class="alert alert-danger mt-4" role="alert" data-test-error>
-          Une erreur s'est produite
-        </div>
 
         <div class="mb-3">
           <label for="product-name" class="form-label"> Nom du produit </label>
@@ -110,16 +163,11 @@ if (!isAuthenticated.value) {
           <button
             type="submit"
             class="btn btn-primary"
-            disabled
             data-test-submit
+            :disabled="isSubmitting"
           >
-            Ajouter le produit
-            <span
-              data-test-spinner
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
+            {{  isSubmitting ? "<span data-test-spinner class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"</span>" 
+                              : "Ajouter le produit" }}
           </button>
         </div>
       </form>

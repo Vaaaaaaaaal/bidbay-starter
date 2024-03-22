@@ -6,15 +6,31 @@ import { getDetails } from '../validators/index.js'
 const router = express.Router()
 
 
+
 router.get('/api/products', async (req, res, next) => {
   try {
-    const products = await Product.findAll(); // Remplacez cette ligne avec la méthode de votre ORM pour récupérer tous les produits
-    res.status(200).json(products); // Renvoie les produits récupérés sous forme de réponse JSON
+    res.json(await Product.findAll(
+      {
+        include: [{
+          model: User,
+          as: 'seller',
+          attributes: ['id', 'username']
+        }, {
+          model: Bid,
+          as: 'bids',
+          attributes: ['id', 'price', 'date']
+        }]
+      }
+    ))
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(400).json({ error })
   }
-});
+  res.status(600).send()
+})
+
+
+
+
 
 router.get('/api/products/:productId', async (req, res) => {
   res.status(600).send()

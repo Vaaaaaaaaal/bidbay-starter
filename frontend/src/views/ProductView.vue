@@ -44,10 +44,12 @@ async function deleteProduct(){
     }
   }
 
-const disabledAddBid = computed(() => {
+  const disabledAddBid = computed(() => {
   const maxPrice = lastBid.value?.price ?? 10;
+  const lastBidderId = lastBid.value?.bidderId ?? null;
   return price.value < maxPrice;
 });
+
 
 const lastBid = computed(() => {
   if (product.value.bids.length > 0) {
@@ -102,6 +104,9 @@ async function deleteBid(bidId) {
 }
 
 async function addBid() {
+  if (isAuthenticated.value && userData.value.id === product.value.sellerId) {
+    return;
+  }
   try {
     const res = await fetch(
       `http://localhost:3000/api/products/${productId.value}/bids`,

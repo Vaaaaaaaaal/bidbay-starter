@@ -49,7 +49,15 @@ if (window.location.href.startsWith("http://localhost:5173/users/")) {
   }
 }
 
-console.log("test");
+const getHighestBid = (bids) => {
+  let highestBid = { price: 0 };
+  bids.forEach((bid) => {
+    if (bid.price > highestBid.price) {
+      highestBid = bid;
+    }
+  });
+  return highestBid;
+};
 </script>
 
 <template>
@@ -123,6 +131,7 @@ console.log("test");
                 <th scope="col">Produit</th>
                 <th scope="col">Offre</th>
                 <th scope="col">Date</th>
+                <th scope="col">Heure</th>
               </tr>
             </thead>
             <tbody>
@@ -130,6 +139,7 @@ console.log("test");
                 v-for="bid in user ? user.bids : null"
                 :key="bid.id"
                 data-test-bid
+                :class="{ 'text-danger': bid.price === getHighestBid(user.bids).price }"
               >
                 <td>
                   <RouterLink
@@ -144,6 +154,7 @@ console.log("test");
                 </td>
                 <td data-test-bid-price>{{ bid.price }} €</td>
                 <td data-test-bid-date>{{ new Date(bid.date).toLocaleDateString() }}</td>
+                <td data-test-bid-date>{{ new Date(bid.date).toLocaleTimeString() }}</td>
               </tr>
             </tbody>
           </table>

@@ -48,16 +48,16 @@ if (window.location.href.startsWith("http://localhost:5173/users/")) {
     fetchUser(userId);
   }
 }
-
-const getHighestBid = (bids) => {
-  let highestBid = { price: 0 };
+const getHighestBidForProduct = (bids) => {
+  const highestBids = {};
   bids.forEach((bid) => {
-    if (bid.price > highestBid.price) {
-      highestBid = bid;
+    if (!highestBids[bid.product.id] || bid.price > highestBids[bid.product.id].price) {
+      highestBids[bid.product.id] = bid;
     }
   });
-  return highestBid;
+  return Object.values(highestBids);
 };
+
 </script>
 
 <template>
@@ -131,16 +131,10 @@ const getHighestBid = (bids) => {
                 <th scope="col">Produit</th>
                 <th scope="col">Offre</th>
                 <th scope="col">Date</th>
-                <th scope="col">Heure</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="bid in user ? user.bids : null"
-                :key="bid.id"
-                data-test-bid
-                :class="{ 'text-danger': bid.price === getHighestBid(user.bids).price }"
-              >
+              <tr v-for="bid in getHighestBidForProduct(user ? user.bids : [])" :key="bid.id" data-test-bid>
                 <td>
                   <RouterLink
                     :to="{
@@ -154,7 +148,6 @@ const getHighestBid = (bids) => {
                 </td>
                 <td data-test-bid-price>{{ bid.price }} €</td>
                 <td data-test-bid-date>{{ new Date(bid.date).toLocaleDateString() }}</td>
-                <td data-test-bid-date>{{ new Date(bid.date).toLocaleTimeString() }}</td>
               </tr>
             </tbody>
           </table>

@@ -13,55 +13,49 @@ if (!isAuthenticated.value) {
 const name = ref("");
 const description = ref("");
 const category = ref("");
-const price = ref("");
-const picture = ref("");
-const date = ref("");
+const originalPrice = ref("");
+const pictureUrl = ref("");
+const endDate = ref("");
+const errorMessage = ref("");
 const isSubmitting = ref(false);
 
-//récupérer id de user actuel
-const userID = token.value.substring(0,32);
-console.log(userID);
 
-// router.push({ name: "Product", params: { productId: 'TODO } });
+
+//récupérer id de user actuel
+const userID = useAuthStore().userData._value.id;
+
 
 const addProduct = async () => {
 
   isSubmitting.value = true;
-  console.log(name);
-
-  
 
   try {
     const response = await fetch("http://localhost:3000/api/products/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        productName: name.value,
+        name: name.value,
         description: description.value,
         category: category.value,
-        originalPrice: price.value,
-        pictureUrl: picture.value,
-        endDate: date.value,
+        originalPrice: originalPrice.value,
+        pictureUrl: pictureUrl.value,
+        endDate: endDate.value,
         sellerId: userID,
       }),
     });
-    
+
 
     if (!response.ok) {
       const { error } = await response.json();
       errorMessage.value = error;
     } else {
-      const { product_id } = await response.json();
-      //router.push({ name: "Product", params: { productId: product_id } });
+      const { newProduct } = await response.json();
+      console.log(newProduct.id);
+      router.push({ name: "Product", params: { productId: newProduct.id } });
+      console.log(name);
     }
   } catch (e) {
-    console.log(e);
-    // a tester 
-    let div = document.createElement('div');
-    div.className("alert alert-danger mt-4");
-    div.role("alert");
-    div.innerHTML("Une erreur s'est produite");
-    document.getElementsById("wrapper-form").appendChild(div);
+    errorMessage.value = e;
   } finally {
     isSubmitting.value = false;
   }
@@ -74,42 +68,27 @@ const addProduct = async () => {
 
   <div class="row justify-content-center">
     <div id="wrapper-form" class="col-md-6">
-      <form>
+      <form @submit.prevent="addProduct">
+        <div v-if="errorMessage" class="alert alert-danger mt-4" role="alert">
+          {{ errorMessage }}
+        </div>
 
         <div class="mb-3">
           <label for="product-name" class="form-label"> Nom du produit </label>
-          <input
-            type="text"
-            class="form-control"
-            id="product-name"
-            required
-            data-test-product-name
-          />
+          <input v-model="name" name="name" type="text" class="form-control" id="product-name" required />
         </div>
 
         <div class="mb-3">
           <label for="product-description" class="form-label">
             Description
           </label>
-          <textarea
-            class="form-control"
-            id="product-description"
-            name="description"
-            rows="3"
-            required
-            data-test-product-description
-          ></textarea>
+          <textarea v-model="description" class="form-control" id="product-description" name="description" rows="3"
+            required></textarea>
         </div>
 
         <div class="mb-3">
           <label for="product-category" class="form-label"> Catégorie </label>
-          <input
-            type="text"
-            class="form-control"
-            id="product-category"
-            required
-            data-test-product-category
-          />
+          <input v-model="category" type="text" name="category" class="form-control" id="product-category" required />
         </div>
 
         <div class="mb-3">
@@ -117,16 +96,8 @@ const addProduct = async () => {
             Prix de départ
           </label>
           <div class="input-group">
-            <input
-              type="number"
-              class="form-control"
-              id="product-original-price"
-              name="originalPrice"
-              step="1"
-              min="0"
-              required
-              data-test-product-price
-            />
+            <input v-model="originalPrice" type="number" class="form-control" id="product-original-price"
+              name="originalPrice" step="1" min="0" required />
             <span class="input-group-text">€</span>
           </div>
         </div>
@@ -135,39 +106,20 @@ const addProduct = async () => {
           <label for="product-picture-url" class="form-label">
             URL de l'image
           </label>
-          <input
-            type="url"
-            class="form-control"
-            id="product-picture-url"
-            name="pictureUrl"
-            required
-            data-test-product-picture
-          />
+          <input v-model="pictureUrl" type="url" class="form-control" id="product-picture-url" name="pictureUrl"
+            required />
         </div>
 
         <div class="mb-3">
           <label for="product-end-date" class="form-label">
             Date de fin de l'enchère
           </label>
-          <input
-            type="date"
-            class="form-control"
-            id="product-end-date"
-            name="endDate"
-            required
-            data-test-product-end-date
-          />
+          <input v-model="endDate" type="date" class="form-control" id="product-end-date" name="endDate" required />
         </div>
 
         <div class="d-grid gap-2">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            data-test-submit
-            :disabled="isSubmitting"
-          >
-            {{  isSubmitting ? "<span data-test-spinner class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"</span>" 
-                              : "Ajouter le produit" }}
+          <button type="submit" class="btn btn-primary" data-test-submit :disabled="isSubmitting">
+            {{ isSubmitting ? "<span data-test-spinner class=\"spinner-border spinner-border-sm\" role=\"status\"aria hidden =\"true\"</span>" : "Ajouter le produit" }}
           </button>
         </div>
       </form>

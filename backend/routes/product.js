@@ -17,12 +17,12 @@ router.post('/api/products/add', async (req, res) => {
   try {
     /** @type {AddRequestBody} */
     const reqBody = req.body
-    const {productName, description, category, originalPrice, pictureUrl, endDate, sellerId } = reqBody
+    const {name, description, category, originalPrice, pictureUrl, endDate, sellerId } = reqBody
 
     // Créer le nouveau produit
     /** @type {ProductObject} */
     const newProduct = await Product.create({
-      productName,
+      name,
       description,
       category,
       originalPrice,
@@ -30,27 +30,10 @@ router.post('/api/products/add', async (req, res) => {
       endDate,
       sellerId,
     });
-    console.log(json({ 
-      product_id: newProduct.id,
-      productName: productName,
-      description : description,
-      category : category,
-      originalPrice : originalPrice,
-      pictureUrl : pictureUrl,
-      endDate : endDate,
-      sellerId :sellerId }))
 
-    res.status(201).json({ 
-      product_id: newProduct.id,
-      productName: productName,
-      description : description,
-      category : category,
-      originalPrice : originalPrice,
-      pictureUrl : pictureUrl,
-      endDate : endDate,
-      sellerId :sellerId })
+    res.status(201).json({newProduct : newProduct})
   } catch (e) {
-    res.status(400).json({ error: 'Invalid or missing information', details: getDetails(e) })
+    res.status(400).json({ error: 'Invalid or missing information', details: e })
   }
   
 });

@@ -22,7 +22,7 @@ const router = express.Router()
 /**
  * Endpoint pour la création d'un nouvel utilisateur
  * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
- * @param {import('express').Response res
+ * @param {import('express').Response} res
  */
 router.post('/api/auth/register', async (req, res) => {
   try {
@@ -68,10 +68,12 @@ router.post('/api/auth/register', async (req, res) => {
     /** @type {string} */
     const token = jwt.sign(payload, JWT_SECRET)
 
+
+
     // Renvoyer l'utilisateur et le token
-    res.status(201).json({ access_token: token })
+    res.status(201).json({ access_token: token})
   } catch (e) {
-    res.status(400).json({ error: 'Invalid or missing information', details: getDetails(e) })
+    res.status(400).json({ error: 'Invalid or missing information' })
   }
 })
 
@@ -84,7 +86,7 @@ router.post('/api/auth/register', async (req, res) => {
 /**
  * Endpoint pour l'authentification d'un utilisateur enregistré
  * @param {import('express').Request<{}, {}, LoginRequestBody>} req
- * @param {import('express').Response res
+ * @param {import('express').Response} res
  */
 router.post('/api/auth/login', async (req, res) => {
   /** @type {LoginRequestBody} */

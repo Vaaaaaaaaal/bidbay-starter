@@ -65,7 +65,7 @@ const getHighestBidForProduct = (bids) => {
     <h1 class="text-center" data-test-username>
       Utilisateur {{ user ? user.username : "" }}
       <span
-        v-if="user ? user.admin : ''"
+      v-if="user && user.admin"
         class="badge rounded-pill bg-primary"
         data-test-admin
         >Admin</span

@@ -6,6 +6,8 @@ const loading = ref(false);
 const error = ref(false);
 const products = ref([]);
 const filterText = ref('');
+const sort = ref('nom');
+
 
 async function fetchProducts() {
   loading.value = true;
@@ -15,6 +17,7 @@ async function fetchProducts() {
     const response = await fetch('http://localhost:3000/api/products');
     const data = await response.json();
     products.value = data;
+    sortProducts('name');
   } catch (e) {
     error.value = true;
   } finally {
@@ -22,15 +25,20 @@ async function fetchProducts() {
   }
 }
 
+
 onMounted(fetchProducts);
 
-function sortByName() {
-  products.value.sort((a, b) => a.name.localeCompare(b.name));
+function sortProducts(type) {
+  if (type === 'price') {
+    products.value = products.value?.sort((a, b) => a.originalPrice - b.originalPrice);
+    sort.value = 'prix';
+  } else {
+    products.value = products.value?.sort((a, b) => a.name.localeCompare(b.name));
+    sort.value = 'nom';
+  }
 }
 
-function sortByPrice() {
-  products.value.sort((a, b) => a.originalPrice - b.originalPrice);
-}
+
 
 function filterProducts() {
   return products.value.filter(product =>
@@ -73,21 +81,19 @@ const getHighestBid = (product) => {
       </div>
       <div class="col-md-6 text-end">
         <div class="btn-group">
-          <button
-            type="button"
-            class="btn btn-primary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            data-test-sorter
-          >
-            Trier par
+          <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-test-sorter>
+            Trier par {{ sort }}
+            <span class="caret"></span>
           </button>
+
           <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <a class="dropdown-item" href="#" @click="sortByName">Nom</a>
+            <li v-on:click="sortProducts('name')">
+              <a class="dropdown-item" href="#"> Nom </a>
             </li>
-            <li>
-              <a class="dropdown-item" href="#" @click="sortByPrice">Prix</a>
+            <li v-on:click="sortProducts('price')">
+              <a class="dropdown-item" href="#" data-test-sorter-price>
+                Prix
+              </a>
             </li>
           </ul>
         </div>

@@ -5,13 +5,58 @@ import { getDetails } from '../validators/index.js'
 
 const router = express.Router()
 
+
+
 router.get('/api/products', async (req, res, next) => {
+  try {
+    res.json(await Product.findAll(
+      {
+        include: [{
+          model: User,
+          as: 'seller',
+          attributes: ['id', 'username']
+        }, {
+          model: Bid,
+          as: 'bids',
+          attributes: ['id', 'price', 'date']
+        }]
+      }
+    ))
+  } catch (error) {
+    res.status(400).json({ error })
+  }
   res.status(600).send()
 })
 
+
+
+
+
 router.get('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
-})
+  try {
+    const product = await Product.findByPk(req.params.productId, {
+      include: [{
+        model: User,
+        as: 'seller'
+      }, {
+        model: Bid,
+        as: 'bids',
+        include: {
+          model: User,
+          as: 'bidder'  
+        }
+      }]
+    });
+    if (!product) {
+      res.status(404).json({ error: 'Product not found' });
+    } else {
+      res.status(200).json(product);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 router.post('/api/products/add', async (req, res) => {
   try {
@@ -39,12 +84,73 @@ router.post('/api/products/add', async (req, res) => {
 });
 
 
-router.put('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
+router.put('/api/products/:productId', authMiddleware, async (req, res) => {
+  const { productId } = req.params;
+  const { name, description, pictureUrl, category, originalPrice, endDate } = req.body;
+
+  let product = await Product.findByPk(productId)
+
+  if (!product) {
+    res.status(404).json({
+      'error': 'Product not found'
+    })
+    return
+  }
+
+  if (product.sellerId != req.user.id && !req.user.admin) {
+    res.status(403).json({
+      'error': 'User not granted'
+    })
+    return
+  }
+
+  try {
+    let updatedProduct = await product.update({
+      name,
+      description,
+      pictureUrl,
+      category,
+      originalPrice,
+      endDate
+    })
+
+    const response = updatedProduct.toJSON()
+    delete response['createdAt']
+    delete response['updatedAt']
+
+    res.status(200).json(response)
+
+  } catch (e) {
+    res.status(400).json({
+      'error': 'Invalid or missing fields', 
+      'details': getDetails(e)
+    })
+  }
 })
 
-router.delete('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
+router.delete('/api/products/:productId', authMiddleware, async (req, res) => {
+  const { productId } = req.params;
+
+  let product = await Product.findByPk(productId)
+
+  if (!product) {
+    res.status(404).json({
+      'error': 'Product not found'
+    })
+    return
+  }
+
+  if (product.sellerId != req.user.id && !req.user.admin) {
+    res.status(403).json({
+      'error': 'User not granted'
+    })
+    return
+  }
+
+  await product.destroy()
+
+  res.status(204).json()
 })
+
 
 export default router

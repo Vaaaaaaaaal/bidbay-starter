@@ -52,7 +52,7 @@ async function deleteProduct(){
 
 
 const lastBid = computed(() => {
-  if (product.value.bids.length > 0) {
+  if (product.value && product.value.bids.length > 0) {
     return product.value.bids.slice(-1)[0] ?? null;
   }
   return null;
@@ -253,7 +253,7 @@ fetchProduct();
           </tbody>
         </table>
 
-        <p data-test-no-bids v-if="product.bids.length === 0">Aucune offre pour le moment</p>
+        <p data-test-no-bids v-if="product && product.bids.length === 0">Aucune offre pour le moment</p>
         <form data-test-bid-form @submit.prevent="addBid">
           <div class="form-group">
             <label for="bidAmount">Votre offre :</label>

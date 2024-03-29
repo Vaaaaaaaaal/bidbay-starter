@@ -58,30 +58,28 @@ router.get('/api/products/:productId', async (req, res) => {
   }
 });
 
-router.post('/api/products/add', async (req, res) => {
+router.post('/api/products', authMiddleware, async (req, res) => {
+  const { name, description, pictureUrl, category, originalPrice, endDate } = req.body;
+
   try {
-    /** @type {AddRequestBody} */
-    const reqBody = req.body
-    const {name, description, category, originalPrice, pictureUrl, endDate, sellerId } = reqBody
+    let product = await Product.create({
+      name, 
+      description, 
+      pictureUrl, 
+      category, 
+      originalPrice, 
+      endDate, 
+      sellerId : req.user.id
+    })
 
-    // Créer le nouveau produit
-    /** @type {ProductObject} */
-    const newProduct = await Product.create({
-      name,
-      description,
-      category,
-      originalPrice,
-      pictureUrl,
-      endDate,
-      sellerId,
-    });
-
-    res.status(201).json({newProduct : newProduct})
+    res.status(201).json(product)
   } catch (e) {
-    res.status(400).json({ error: 'Invalid or missing information', details: e })
+    res.status(400).json({
+      'error': 'Invalid or missing fields', 
+      'details': getDetails(e)
+    })
   }
-  
-});
+})
 
 
 router.put('/api/products/:productId', authMiddleware, async (req, res) => {

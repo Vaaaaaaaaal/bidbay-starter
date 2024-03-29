@@ -10,85 +10,99 @@ if (!isAuthenticated.value) {
   router.push({ name: "Login" });
 }
 
-const name = ref("");
-const description = ref("");
-const category = ref("");
-const originalPrice = ref("");
-const pictureUrl = ref("");
-const endDate = ref("");
-const errorMessage = ref("");
-const isSubmitting = ref(false);
+const productName = ref('')
+const productDescription = ref('')
+const productPictureUrl = ref('')
+const productCategory = ref('')
+const productOriginalPrice = ref('')
+const productEndDate = ref('')
 
+const loading = ref(false);
+const error = ref(false);
 
-
-//récupérer id de user actuel
-const userID = useAuthStore().userData._value.id;
-
-
-const addProduct = async () => {
-
-  isSubmitting.value = true;
-
-  try {
-    const response = await fetch("http://localhost:3000/api/products/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+async function addProduct(){
+  loading.value = true  
+  try{
+    let response = await fetch('http://localhost:3000/api/products', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token.value}`,
+        'Content-Type': 'application/json',
+        accept: 'application/json'
+      },
       body: JSON.stringify({
-        name: name.value,
-        description: description.value,
-        category: category.value,
-        originalPrice: originalPrice.value,
-        pictureUrl: pictureUrl.value,
-        endDate: endDate.value,
-        sellerId: userID,
-      }),
-    });
-
-
-    if (!response.ok) {
-      const { error } = await response.json();
-      errorMessage.value = error;
-    } else {
-      const { newProduct } = await response.json();
-      console.log(newProduct.id);
-      router.push({ name: "Product", params: { productId: newProduct.id } });
-      console.log(name);
+        name: productName.value,
+        description: productDescription.value,
+        pictureUrl: productPictureUrl.value,
+        category: productCategory.value,
+        originalPrice: productOriginalPrice.value,
+        endDate: productEndDate.value
+      })
+    })
+    if(response.ok) {
+      let product = await response.json()
+      router.push({ name: "Product", params: { productId: product.id } })
+    } else{
+      error.value = true
     }
-  } catch (e) {
-    errorMessage.value = e;
-  } finally {
-    isSubmitting.value = false;
+    
+  } catch(e){
+    error.value = true
+  } finally{
+    loading.value = false  
   }
-};
+}
 
 </script>
+
 
 <template>
   <h1 class="text-center">Ajouter un produit</h1>
 
   <div class="row justify-content-center">
-    <div id="wrapper-form" class="col-md-6">
-      <form @submit.prevent="addProduct">
-        <div v-if="errorMessage" class="alert alert-danger mt-4" role="alert">
-          {{ errorMessage }}
+    <div class="col-md-6">
+      <form @submit.prevent="addProduct()">
+        <div v-if="error" class="alert alert-danger mt-4" role="alert" data-test-error>
+          Une erreur s'est produite
         </div>
 
         <div class="mb-3">
           <label for="product-name" class="form-label"> Nom du produit </label>
-          <input v-model="name" name="name" type="text" class="form-control" id="product-name" required />
+          <input
+            type="text"
+            class="form-control"
+            id="product-name"
+            v-model="productName"
+            required
+            data-test-product-name
+          />
         </div>
 
         <div class="mb-3">
           <label for="product-description" class="form-label">
             Description
           </label>
-          <textarea v-model="description" class="form-control" id="product-description" name="description" rows="3"
-            required></textarea>
+          <textarea
+            class="form-control"
+            id="product-description"
+            name="description"
+            v-model="productDescription"
+            rows="3"
+            required
+            data-test-product-description
+          ></textarea>
         </div>
 
         <div class="mb-3">
           <label for="product-category" class="form-label"> Catégorie </label>
-          <input v-model="category" type="text" name="category" class="form-control" id="product-category" required />
+          <input
+            type="text"
+            class="form-control"
+            v-model="productCategory"
+            id="product-category"
+            required
+            data-test-product-category
+          />
         </div>
 
         <div class="mb-3">
@@ -96,8 +110,17 @@ const addProduct = async () => {
             Prix de départ
           </label>
           <div class="input-group">
-            <input v-model="originalPrice" type="number" class="form-control" id="product-original-price"
-              name="originalPrice" step="1" min="0" required />
+            <input
+              type="number"
+              class="form-control"
+              id="product-original-price"
+              v-model="productOriginalPrice"
+              name="originalPrice"
+              step="1"
+              min="0"
+              required
+              data-test-product-price
+            />
             <span class="input-group-text">€</span>
           </div>
         </div>
@@ -106,20 +129,47 @@ const addProduct = async () => {
           <label for="product-picture-url" class="form-label">
             URL de l'image
           </label>
-          <input v-model="pictureUrl" type="url" class="form-control" id="product-picture-url" name="pictureUrl"
-            required />
+          <input
+            type="url"
+            class="form-control"
+            v-model="productPictureUrl"
+            id="product-picture-url"
+            name="pictureUrl"
+            required
+            data-test-product-picture
+          />
         </div>
 
         <div class="mb-3">
           <label for="product-end-date" class="form-label">
             Date de fin de l'enchère
           </label>
-          <input v-model="endDate" type="date" class="form-control" id="product-end-date" name="endDate" required />
+          <input
+            type="date"
+            class="form-control"
+            id="product-end-date"
+            v-model="productEndDate"
+            name="endDate"
+            required
+            data-test-product-end-date
+          />
         </div>
 
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-primary" data-test-submit :disabled="isSubmitting">
-            {{ isSubmitting ? "<span data-test-spinner class=\"spinner-border spinner-border-sm\" role=\"status\"aria hidden =\"true\"</span>" : "Ajouter le produit" }}
+          <button
+            type="submit"
+            class="btn btn-primary"
+            data-test-submit
+            
+          >
+            Ajouter le produit
+            <span
+              data-test-spinner
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+              v-if="loading"
+            ></span>
           </button>
         </div>
       </form>

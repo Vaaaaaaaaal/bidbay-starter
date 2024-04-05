@@ -22,7 +22,6 @@ function formatDate(date) {
 }
 
 async function deleteProduct(){
-  loading.value = true
   try {
     const response = await fetch('http://localhost:3000/api/products/' + productId.value, {
       method: 'DELETE',
@@ -57,6 +56,7 @@ const lastBid = computed(() => {
 });
 
 async function fetchProduct() {
+  loading.value = true;
   try {
     const response = await fetch(`http://localhost:3000/api/products/${productId.value}`);
     if (response.ok) {
@@ -170,7 +170,7 @@ onUnmounted(() => {
 
 <template>
   <div class="row">
-    <div v-if="loading && !product" class="text-center mt-4" data-test-loading>
+    <div v-if="loading && !error" class="text-center mt-4" data-test-loading>
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Chargement...</span>
       </div>
@@ -179,7 +179,8 @@ onUnmounted(() => {
     <div class="alert alert-danger mt-4" v-if="error" role="alert" data-test-error>
       Une erreur est survenue lors du chargement des produits.
     </div>
-    <div class="row" v-if="!loading" data-test-product>
+
+    <div v-if="!loading && !error" data-test-product>
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img

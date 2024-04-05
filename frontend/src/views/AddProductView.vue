@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 
+
 const { isAuthenticated, token } = useAuthStore();
 const router = useRouter();
 
@@ -40,6 +41,7 @@ async function addProduct(){
       })
     })
     if(response.ok) {
+      /**@type {ProductObject} */
       let product = await response.json()
       router.push({ name: "Product", params: { productId: product.id } })
     } else{

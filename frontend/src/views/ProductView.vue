@@ -9,12 +9,14 @@ const route = useRoute();
 const router = useRouter();
 
 const productId = ref(route.params.productId);
+/**@type {Ref<ProductObject>}   */
 const product = ref();
 const loading = ref(true);
 const error = ref(false);
 const isOwner = ref(false);
 const price = ref(0);
-let intervalId = null;
+/** @type {int} */
+let intervalId  = null;
 
 function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };
@@ -42,12 +44,15 @@ async function deleteProduct(){
     }
   }
 
-const disabledAddBid = computed(() => {
+  const disabledAddBid = computed(() => {
+  /** @type {int} */
   const maxPrice = lastBid.value?.price ?? 10;
+  /** @type {UserObject} */
   const lastBidderId = lastBid.value?.bidderId ?? null;
   return price.value < maxPrice;
 });
 
+/**@type {BidObject} */
 const lastBid = computed(() => {
   if (product.value.bids.length > 0) {
     return product.value.bids.slice(-1)[0] ?? null;
@@ -60,6 +65,7 @@ async function fetchProduct() {
   try {
     const response = await fetch(`http://localhost:3000/api/products/${productId.value}`);
     if (response.ok) {
+      /**@type {Json}    */
       const data = await response.json();
       product.value = data;
       loading.value = false;
@@ -73,6 +79,7 @@ async function fetchProduct() {
       startCountdown();
     } else if (response.status === 404) {
       error.value = true;
+      /** @type {Error}  */
       errorMessage.value = "Product not found";
       loading.value = false;
     } else {

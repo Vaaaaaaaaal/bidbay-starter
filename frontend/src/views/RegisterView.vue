@@ -40,6 +40,7 @@ const registerUser = async () => {
     });
 
     if (!response.ok) {
+      /** @type {Json}   */
       const { error } = await response.json();
       errorMessage.value = error;
     } else {

@@ -1,11 +1,23 @@
 import express from 'express'
 import { User, Product, Bid } from '../orm/index.js'
+/**
+ * @typedef {import('../orm/models/user.js')}
+ */
 
 const router = express.Router()
 
+/**
+ * @typedef {object} RegisterRequestBody
+ * @property {string} username
+ * @property {string} email
+ * @property {string} password
+ */
+
 router.get('/api/users/:userId', async (req, res) => {
+  /** @type {string} */
   const userId = req.params.userId;
   try {
+    /** @type {UserObject} */
     const user = await User.findOne({
       where: { id: userId },
       include: [

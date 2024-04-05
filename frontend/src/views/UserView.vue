@@ -9,9 +9,15 @@ const user = ref(null);
 const loading = ref(true);
 const error = ref(false);
 
+
+/**
+ * 
+ * @param {string} idUser 
+ */
 async function fetchUser(idUser) {
   loading.value = true;
   error.value = false;
+  /**@type {string} */
   let str;
   if (idUser === "me") {
     str = "http://localhost:3000/api/users/" + userData.value.id;
@@ -36,6 +42,7 @@ if (!isAuthenticated) {
 }
 
 if (window.location.href.startsWith("http://localhost:5173/users/")) {
+  /** @type {string} */
   let userId;
   if (window.location.href.includes("me")) {
     fetchUser("me");
@@ -48,7 +55,13 @@ if (window.location.href.startsWith("http://localhost:5173/users/")) {
     fetchUser(userId);
   }
 }
+/**
+ * 
+ * @param {string} bids
+ * @returns {int}  
+ */
 const getHighestBidForProduct = (bids) => {
+  /**@type {BidObject}   */
   const highestBids = {};
   bids.forEach((bid) => {
     if (!highestBids[bid.product.id] || bid.price > highestBids[bid.product.id].price) {

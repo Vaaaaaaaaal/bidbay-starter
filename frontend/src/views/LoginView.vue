@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router/dist/vue-router";
 
+
 const { login, isAuthenticated } = useAuthStore();
 const router = useRouter();
 
@@ -29,9 +30,11 @@ const registerUser = async () => {
     });
 
     if (!response.ok) {
+      /**@type {ResponseObject}   */
       const { error } = await response.json();
       errorMessage.value = error;
     } else {
+      /**@type {ResponseObject} */
       const { access_token } = await response.json();
       login(access_token);
       router.push({ name: "Home" });

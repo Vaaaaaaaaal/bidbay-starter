@@ -8,7 +8,6 @@ const products = ref([]);
 const filterText = ref('');
 const sort = ref('nom');
 
-
 async function fetchProducts() {
   loading.value = true;
   error.value = false;
@@ -25,7 +24,6 @@ async function fetchProducts() {
   }
 }
 
-
 onMounted(fetchProducts);
 
 function sortProducts(type) {
@@ -38,28 +36,30 @@ function sortProducts(type) {
   }
 }
 
-
-
 function filterProducts() {
   return products.value.filter(product =>
     product.name.toLowerCase().includes(filterText.value.toLowerCase())
   );
 }
 
-/**@type {BidObject} */
-const getHighestBid = (/**@type {ProductObject}*/product) => {
+/**
+ * @param {import('../types').Product} product
+ * @returns {number}
+ */
+const getHighestBid = (product) => {
   if (!product.bids || product.bids.length === 0) {
     return product.originalPrice;
   }
-/**@type {BidObject} */
+
+  /** @type {import('../types').Bid} */
   const highestBid = product.bids.reduce((max, bid) => {
     return bid.price > max.price ? bid : max;
   });
 
   return highestBid.price;
 };
-
 </script>
+
 
 <template>
   <div>

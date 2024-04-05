@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/auth";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 
+
 const { isAuthenticated, token } = useAuthStore();
 const router = useRouter();
 

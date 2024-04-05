@@ -9,6 +9,11 @@ const user = ref(null);
 const loading = ref(true);
 const error = ref(false);
 
+
+/**
+ * 
+ * @param {string} idUser 
+ */
 async function fetchUser(idUser) {
   loading.value = true;
   error.value = false;
@@ -50,8 +55,12 @@ if (window.location.href.startsWith("http://localhost:5173/users/")) {
     fetchUser(userId);
   }
 }
-/**@type {BidObject}   */
-const getHighestBidForProduct = (/**@type {BidObject}   */bids) => {
+/**
+ * 
+ * @param {string} bids
+ * @returns {int}  
+ */
+const getHighestBidForProduct = (bids) => {
   /**@type {BidObject}   */
   const highestBids = {};
   bids.forEach((bid) => {

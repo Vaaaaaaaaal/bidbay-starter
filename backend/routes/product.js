@@ -17,18 +17,6 @@ const router = express.Router()
  */
 
 /**
- * @typedef {object} ProductObject
- * @property {string} name
- * @property {string} description
- * @property {string} pictureUrl
- * @property {string} category
- * @property {int} originalPrice
- * @property {Date} endDate
- * @property {string} sellerId
- * 
- */
-
-/**
  * Endpoint pour récupérer les produits
  * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
  * @param {import('express').Response} res

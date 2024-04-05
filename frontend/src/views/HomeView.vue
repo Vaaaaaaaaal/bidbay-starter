@@ -43,7 +43,7 @@ function filterProducts() {
 }
 
 /**
- * @param {import('../types').Product} product
+ * @param {ProductObject} product
  * @returns {number}
  */
 const getHighestBid = (product) => {
@@ -51,7 +51,6 @@ const getHighestBid = (product) => {
     return product.originalPrice;
   }
 
-  /** @type {import('../types').Bid} */
   const highestBid = product.bids.reduce((max, bid) => {
     return bid.price > max.price ? bid : max;
   });

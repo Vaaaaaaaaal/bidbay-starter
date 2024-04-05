@@ -133,9 +133,14 @@ const getHighestBid = (product) => {
               </RouterLink>
             </p>
             <p class="card-text" data-test-product-date>
-            En cours jusqu'au {{ new Date(product.endDate).toLocaleDateString('fr-FR') }}
-          </p>            
-          <p class="card-text" data-test-product-price>
+              <span v-if="new Date(product.endDate) > new Date()">
+                En cours jusqu'au {{ new Date(product.endDate).toLocaleDateString('fr-FR') }}
+              </span>
+              <span v-else>
+                Terminé
+              </span>
+            </p>
+            <p class="card-text" data-test-product-price>
               Prix de départ : {{ product.originalPrice }} €
             </p>
             <p class="card-text" data-test-product-price>

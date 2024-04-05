@@ -14,6 +14,7 @@ const product = ref();
 const loading = ref(true);
 const error = ref(false);
 const isOwner = ref(false);
+const bidPrice = ref(null);
 const price = ref(0);
 
 function formatDate(date) {
@@ -52,7 +53,7 @@ async function deleteProduct(){
 
 
 const lastBid = computed(() => {
-  if (product.value && product.value.bids.length > 0) {
+  if (product.value.bids.length > 0) {
     return product.value.bids.slice(-1)[0] ?? null;
   }
   return null;
@@ -69,7 +70,6 @@ async function fetchProduct() {
       if (isAuthenticated.value && userData.value.id === product.value.sellerId) {
         isOwner.value = true;
       }
-
     } else if (response.status === 404) {
       error.value = true;
       errorMessage.value = "Product not found";
@@ -253,17 +253,11 @@ fetchProduct();
           </tbody>
         </table>
 
-        <p data-test-no-bids v-if="product && product.bids.length === 0">Aucune offre pour le moment</p>
+        <p data-test-no-bids v-if="product.bids.length === 0">Aucune offre pour le moment</p>
         <form data-test-bid-form @submit.prevent="addBid">
           <div class="form-group">
             <label for="bidAmount">Votre offre :</label>
-            <input
-              type="number"
-              class="form-control"
-              id="bidAmount"
-              data-test-bid-form-price
-              v-model="price"
-            />
+            <input type="number" class="form-control" id="bidAmount" v-model="bidPrice" data-test-bid-form-price />
             <small class="form-text text-muted">
               Le montant doit être supérieur à 10 €.
             </small>

@@ -158,20 +158,20 @@ async function addProduct(){
 
         <div class="d-grid gap-2">
           <button
-            type="submit"
-            class="btn btn-primary"
-            data-test-submit
-            
-          >
-            Ajouter le produit
-            <span
-              data-test-spinner
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-              v-if="loading"
-            ></span>
-          </button>
+          type="submit"
+          class="btn btn-primary"
+          data-test-submit
+          :disabled="loading"
+        >
+          Ajouter le produit
+          <span
+            data-test-spinner
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+            v-if="loading"
+          ></span>
+        </button>
         </div>
       </form>
     </div>

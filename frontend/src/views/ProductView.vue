@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { useAuthStore } from "../store/auth";
 
 const { isAuthenticated, isAdmin, userData, token } = useAuthStore();
-
 
 const route = useRoute();
 const router = useRouter();
@@ -14,14 +13,13 @@ const product = ref();
 const loading = ref(true);
 const error = ref(false);
 const isOwner = ref(false);
-const bidPrice = ref(null);
 const price = ref(0);
+let intervalId = null;
 
 function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };
   return new Date(date).toLocaleDateString("fr-FR", options);
 }
-
 
 async function deleteProduct(){
   loading.value = true
@@ -45,12 +43,11 @@ async function deleteProduct(){
     }
   }
 
-  const disabledAddBid = computed(() => {
+const disabledAddBid = computed(() => {
   const maxPrice = lastBid.value?.price ?? 10;
   const lastBidderId = lastBid.value?.bidderId ?? null;
   return price.value < maxPrice;
 });
-
 
 const lastBid = computed(() => {
   if (product.value.bids.length > 0) {
@@ -73,6 +70,7 @@ async function fetchProduct() {
       const lastBidPrice = lastBid.value?.price ?? product.value.originalPrice;
       price.value = lastBidPrice + 1;
 
+      startCountdown();
     } else if (response.status === 404) {
       error.value = true;
       errorMessage.value = "Product not found";
@@ -128,16 +126,17 @@ async function addBid() {
   }
 }
 
-let timeoutId = null;
+const countdown = ref('');
 
-const countdown = computed(() => {
+function updateCountdown() {
   const end = new Date(product.value.endDate);
   const now = new Date();
   const diff = end.getTime() - now.getTime();
 
   if (diff <= 0) {
-    clearTimeout(timeoutId);
-    return "Terminé";
+    countdown.value = "Terminé";
+    stopCountdown();
+    return;
   }
 
   const seconds = Math.floor(diff / 1000) % 60;
@@ -145,23 +144,33 @@ const countdown = computed(() => {
   const hours = Math.floor(diff / 1000 / 60 / 60) % 24;
   const days = Math.floor(diff / 1000 / 60 / 60 / 24);
 
-  clearTimeout(timeoutId);
-  timeoutId = setTimeout(() => {
-    countdown.value;
-  }, 1000);
+  countdown.value = `${days}j ${hours}h ${minutes}min ${seconds}s`;
+}
 
-  return `${days}j ${hours}h ${minutes}min ${seconds}s`;
+function startCountdown() {
+  if (!product.value || !product.value.endDate) {
+    return;
+  }
+  updateCountdown();
+  intervalId = setInterval(updateCountdown, 1000);
+}
+
+function stopCountdown() {
+  clearInterval(intervalId);
+}
+
+onMounted(() => {
+  fetchProduct();
 });
 
-
-fetchProduct();
-
-
+onUnmounted(() => {
+  stopCountdown();
+});
 </script>
 
 <template>
   <div class="row">
-    <div class="text-center mt-4" v-if="loading" data-test-loading>
+    <div v-if="loading && !product" class="text-center mt-4" data-test-loading>
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Chargement...</span>
       </div>
@@ -174,6 +183,7 @@ fetchProduct();
       <!-- Colonne de gauche : image et compte à rebours -->
       <div class="col-lg-4">
         <img
+          v-if="product"
           :src="product.pictureUrl"
           alt=""
           class="img-fluid rounded mb-3"
@@ -195,12 +205,13 @@ fetchProduct();
       <div class="col-lg-8">
         <div class="row">
           <div class="col-lg-6">
-            <h1 class="mb-3" data-test-product-name>
+            <h1 v-if="product" class="mb-3" data-test-product-name>
               {{product.name}}
             </h1>
           </div>
           <div class="col-lg-6 text-end" v-if="isAdmin || isOwner">
             <RouterLink
+              v-if="product"
               :to="{ name: 'ProductEdition', params: { productId: product.id } }"
               class="btn btn-primary"
               data-test-edit-product
@@ -208,24 +219,25 @@ fetchProduct();
               Editer
             </RouterLink>
             &nbsp;
-            <button @click="deleteProduct()" class="btn btn-danger" data-test-delete-product>
+            <button v-if="product" @click="deleteProduct()" class="btn btn-danger" data-test-delete-product>
               Supprimer
             </button>
           </div>
         </div>
 
-        <h2 class="mb-3">Description</h2>
-        <p data-test-product-description>
+        <h2 v-if="product" class="mb-3">Description</h2>
+        <p v-if="product" data-test-product-description>
           {{product.description}}
         </p>
 
-        <h2 class="mb-3">Informations sur l'enchère</h2>
-        <ul>
+        <h2 v-if="product" class="mb-3">Informations sur l'enchère</h2>
+        <ul v-if="product">
           <li data-test-product-price>Prix de départ : {{product.originalPrice}} €</li>
           <li data-test-product-end-date>Date de fin : {{ formatDate(product.endDate) }}</li>
           <li>
             Vendeur :
             <router-link
+              v-if="product"
               :to="{ name: 'User', params: { userId: product.sellerId } }"
               data-test-product-seller
             >
@@ -234,8 +246,8 @@ fetchProduct();
           </li>
         </ul>
 
-        <h2 class="mb-3">Offres sur le produit</h2>
-        <table class="table table-striped" data-test-bids>
+        <h2 v-if="product" class="mb-3">Offres sur le produit</h2>
+        <table v-if="product" class="table table-striped" data-test-bids>
           <thead>
             <tr>
               <th scope="col">Enchérisseur</th>
@@ -265,11 +277,11 @@ fetchProduct();
           </tbody>
         </table>
 
-        <p data-test-no-bids v-if="product.bids.length === 0">Aucune offre pour le moment</p>
+        <p data-test-no-bids v-if="product && product.bids.length === 0">Aucune offre pour le moment</p>
         <form data-test-bid-form @submit.prevent="addBid">
           <div class="form-group">
             <label for="bidAmount">Votre offre :</label>
-            <input type="number" class="form-control" id="bidAmount" v-model="bidPrice" data-test-bid-form-price />
+            <input type="number" class="form-control" id="bidAmount" data-test-bid-form-price v-model="price" />
             <small class="form-text text-muted">
               Le montant doit être supérieur à 10 €.
             </small>

@@ -125,12 +125,15 @@ async function addBid() {
   }
 }
 
+let timeoutId = null;
+
 const countdown = computed(() => {
   const end = new Date(product.value.endDate);
   const now = new Date();
   const diff = end.getTime() - now.getTime();
 
   if (diff <= 0) {
+    clearTimeout(timeoutId);
     return "Terminé";
   }
 
@@ -139,8 +142,14 @@ const countdown = computed(() => {
   const hours = Math.floor(diff / 1000 / 60 / 60) % 24;
   const days = Math.floor(diff / 1000 / 60 / 60 / 24);
 
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => {
+    countdown.value;
+  }, 1000);
+
   return `${days}j ${hours}h ${minutes}min ${seconds}s`;
 });
+
 
 fetchProduct();
 

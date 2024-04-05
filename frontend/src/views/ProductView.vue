@@ -69,6 +69,8 @@ async function fetchProduct() {
       if (isAuthenticated.value && userData.value.id === product.value.sellerId) {
         isOwner.value = true;
       }
+      const lastBidPrice = lastBid.value?.price ?? product.value.originalPrice;
+      price.value = lastBidPrice + 1;
 
     } else if (response.status === 404) {
       error.value = true;

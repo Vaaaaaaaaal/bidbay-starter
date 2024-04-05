@@ -126,7 +126,7 @@ router.post('/api/products', authMiddleware, async (req, res) => {
  * @param {import('express').Response} res
  */
 router.put('/api/products/:productId', authMiddleware, async (req, res) => {
-  /**@type {int} */
+  /**@type {string} */
   const { productId } = req.params;
   /**@type {RegisterRequestBody} */
   const { name, description, pictureUrl, category, originalPrice, endDate } = req.body;

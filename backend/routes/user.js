@@ -13,6 +13,7 @@ const router = express.Router()
  * @property {string} password
  */
 
+
 router.get('/api/users/:userId', async (req, res) => {
   /** @type {string} */
   const userId = req.params.userId;

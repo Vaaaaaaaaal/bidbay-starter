@@ -3,8 +3,17 @@ import { ref } from "vue";
 
 import { useAuthStore } from "@/store/auth";
 
-const { isAuthenticated, userData } = useAuthStore();
 
+
+const { isAuthenticated, userData } = useAuthStore();
+/**
+ *@typedef { import("vue").Ref } Ref 
+ */
+/**
+ * @typedef {import('../../../backend/types/types.js')}
+ */
+
+ /**@type {Ref<UserObject|null>} */
 const user = ref(null);
 const loading = ref(true);
 const error = ref(false);
@@ -57,8 +66,8 @@ if (window.location.href.startsWith("http://localhost:5173/users/")) {
 }
 /**
  * 
- * @param {string} bids
- * @returns {int}  
+ * @param {string[]} bids
+ * @returns {BidObject[]}
  */
 const getHighestBidForProduct = (bids) => {
   /**@type {BidObject}   */

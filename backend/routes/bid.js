@@ -13,13 +13,7 @@ const router = express.Router()
  * @property {Date} date
  */
 
-/**
- * @typedef {object} BidObject
- * @property {string} idProduct
- * @property {int} price
- * @property {string} bidderId
- * @property {Date} date
- */
+
 
 /**
  * Endpoint pour la suppression d'un bid

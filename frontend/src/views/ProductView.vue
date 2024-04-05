@@ -15,7 +15,8 @@ const loading = ref(true);
 const error = ref(false);
 const isOwner = ref(false);
 const price = ref(0);
-let intervalId = null;
+/** @type {int} */
+let intervalId  = null;
 
 function formatDate(date) {
   const options = { year: "numeric", month: "long", day: "numeric" };

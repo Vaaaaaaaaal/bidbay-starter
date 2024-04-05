@@ -8,7 +8,6 @@ const products = ref([]);
 const filterText = ref('');
 const sort = ref('nom');
 
-
 async function fetchProducts() {
   loading.value = true;
   error.value = false;
@@ -25,7 +24,6 @@ async function fetchProducts() {
   }
 }
 
-
 onMounted(fetchProducts);
 
 function sortProducts(type) {
@@ -38,14 +36,16 @@ function sortProducts(type) {
   }
 }
 
-
-
 function filterProducts() {
   return products.value.filter(product =>
     product.name.toLowerCase().includes(filterText.value.toLowerCase())
   );
 }
 
+/**
+ * @param {ProductObject} product
+ * @returns {number}
+ */
 const getHighestBid = (product) => {
   if (!product.bids || product.bids.length === 0) {
     return product.originalPrice;
@@ -57,8 +57,8 @@ const getHighestBid = (product) => {
 
   return highestBid.price;
 };
-
 </script>
+
 
 <template>
   <div>

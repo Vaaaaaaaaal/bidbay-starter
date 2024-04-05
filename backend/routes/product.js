@@ -4,9 +4,24 @@ import authMiddleware from '../middlewares/auth.js'
 import { getDetails } from '../validators/index.js'
 
 const router = express.Router()
+/**
+ * @typedef {object} RegisterRequestBody
+ * @property {string} name
+ * @property {string} description
+ * @property {string} pictureUrl
+ * @property {string} category
+ * @property {int} originalPrice
+ * @property {Date} endDate
+ * @property {string} sellerId
+ * 
+ */
 
-
-
+/**
+ * Endpoint pour récupérer les produits
+ * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
+ * @param {import('express').Response} res
+ * @param {} next  
+ */
 router.get('/api/products', async (req, res, next) => {
   try {
     res.json(await Product.findAll(
@@ -31,9 +46,14 @@ router.get('/api/products', async (req, res, next) => {
 
 
 
-
+/**
+ * Endpoint pour récupérer un produit
+ * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
+ * @param {import('express').Response} res
+ */
 router.get('/api/products/:productId', async (req, res) => {
   try {
+    /** @type {ProductObject} */
     const product = await Product.findByPk(req.params.productId, {
       include: [{
         model: User,
@@ -58,10 +78,17 @@ router.get('/api/products/:productId', async (req, res) => {
   }
 });
 
+/**
+ * Endpoint pour créer un produit
+ * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
+ * @param {import('express').Response} res
+ */
 router.post('/api/products', authMiddleware, async (req, res) => {
+  /** @type {RegisterRequestBody} */
   const { name, description, pictureUrl, category, originalPrice, endDate } = req.body;
 
   try {
+    /** @type {ProductObject} */
     let product = await Product.create({
       name, 
       description, 
@@ -81,11 +108,17 @@ router.post('/api/products', authMiddleware, async (req, res) => {
   }
 })
 
-
+/**
+ * Endpoint pour modifier un produit
+ * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
+ * @param {import('express').Response} res
+ */
 router.put('/api/products/:productId', authMiddleware, async (req, res) => {
+  /**@type {string} */
   const { productId } = req.params;
+  /**@type {RegisterRequestBody} */
   const { name, description, pictureUrl, category, originalPrice, endDate } = req.body;
-
+  /** @type {ProductObject} */
   let product = await Product.findByPk(productId)
 
   if (!product) {
@@ -103,6 +136,7 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) => {
   }
 
   try {
+    /** @type {ProductObject} */
     let updatedProduct = await product.update({
       name,
       description,
@@ -112,6 +146,7 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) => {
       endDate
     })
 
+    /** @type {JSON} */ 
     const response = updatedProduct.toJSON()
     delete response['createdAt']
     delete response['updatedAt']
@@ -126,9 +161,15 @@ router.put('/api/products/:productId', authMiddleware, async (req, res) => {
   }
 })
 
+/**
+ * Endpoint pour supprimer un produit
+ * @param {import('express').Request<{}, {}, RegisterRequestBody>} req
+ * @param {import('express').Response} res
+ */
+
 router.delete('/api/products/:productId', authMiddleware, async (req, res) => {
   const { productId } = req.params;
-
+  /** @type {ProductObject} */
   let product = await Product.findByPk(productId)
 
   if (!product) {

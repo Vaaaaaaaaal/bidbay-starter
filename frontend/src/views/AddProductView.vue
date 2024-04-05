@@ -40,6 +40,7 @@ async function addProduct(){
       })
     })
     if(response.ok) {
+      /**@type {ProductObject} */
       let product = await response.json()
       router.push({ name: "Product", params: { productId: product.id } })
     } else{

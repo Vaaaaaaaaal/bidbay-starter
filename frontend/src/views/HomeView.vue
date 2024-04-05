@@ -46,11 +46,12 @@ function filterProducts() {
   );
 }
 
-const getHighestBid = (product) => {
+/**@type {BidObject} */
+const getHighestBid = (/**@type {ProductObject}*/product) => {
   if (!product.bids || product.bids.length === 0) {
     return product.originalPrice;
   }
-
+/**@type {BidObject} */
   const highestBid = product.bids.reduce((max, bid) => {
     return bid.price > max.price ? bid : max;
   });
